@@ -1,0 +1,74 @@
+With
+-- Employment table subquery
+employ As (
+  Select id_number, job_title, fld_of_work_code, employer_name1,
+    -- If there's an employer ID filled in, use the entity name
+    Case
+      When employer_id_number Is Not Null And employer_id_number != ' ' Then (
+        Select pref_mail_name
+        From entity
+        Where id_number = employer_id_number)
+      -- Otherwise use the write-in field
+      Else trim(employer_name1 || ' ' || employer_name2)
+    End As employer_name
+  From employment
+  Where employment.primary_emp_ind = 'Y'
+)
+
+--- Degree Fields 
+
+Select 
+
+rpt_pbh634.v_entity_ksm_degrees.ID_NUMBER,
+
+rpt_pbh634.v_entity_ksm_degrees.REPORT_NAME,
+
+rpt_pbh634.v_entity_ksm_degrees.RECORD_STATUS_CODE,
+
+rpt_pbh634.v_entity_ksm_degrees.FIRST_KSM_YEAR,
+      
+rpt_pbh634.v_entity_ksm_degrees.PROGRAM,
+
+--- Gender Code
+       
+Entity.Gender_Code,
+
+--- Employment
+
+Employ.fld_of_work_code,
+
+Employ.employer_name1,
+
+Employ.job_title, 
+
+--- City, State, Zip, Geo Codes By Household 
+
+rpt_pbh634.v_entity_ksm_households.HOUSEHOLD_CITY,
+
+rpt_pbh634.v_entity_ksm_households.HOUSEHOLD_STATE,
+
+rpt_pbh634.v_entity_ksm_households.HOUSEHOLD_ZIP,
+
+rpt_pbh634.v_entity_ksm_households.HOUSEHOLD_GEO_CODES,
+
+rpt_pbh634.v_entity_ksm_households.HOUSEHOLD_COUNTRY,
+
+rpt_pbh634.v_entity_ksm_households.HOUSEHOLD_CONTINENT
+
+From rpt_pbh634.v_entity_ksm_degrees
+
+---- Join Entity 
+
+Inner Join Entity on rpt_pbh634.v_entity_ksm_degrees.ID_NUMBER = Entity.Id_Number
+
+---- Join Households 
+
+Left Join rpt_pbh634.v_entity_ksm_households On rpt_pbh634.v_entity_ksm_degrees.ID_NUMBER = rpt_pbh634.v_entity_ksm_households.ID_NUMBER
+
+---- Join Employment 
+
+Left Join Employ On rpt_pbh634.v_entity_ksm_degrees.ID_NUMBER = Employ.Id_Number
+
+---- Active Alumni 
+
+Where rpt_pbh634.v_entity_ksm_degrees.Record_Status_Code = 'A';
