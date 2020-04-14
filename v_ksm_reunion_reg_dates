@@ -1,0 +1,31 @@
+create or replace view v_ksm_reunion_reg_dates as
+With aff As (Select *
+FROM  affiliation
+WHERE affiliation.affil_level_code = 'RG'
+AND affiliation.affil_code = 'KM' )
+
+Select
+ep_registration.registration_id,
+ep_registration.contact_id_number,
+ep_event.event_id,
+ep_event.event_name,
+ep_registration.response_date,
+rpt_pbh634.v_entity_ksm_degrees.FIRST_KSM_YEAR,
+rpt_pbh634.v_entity_ksm_degrees.PROGRAM,
+rpt_pbh634.v_entity_ksm_degrees.PROGRAM_GROUP,
+rpt_pbh634.v_entity_ksm_degrees.PROGRAM_GROUP_RANK,
+rpt_pbh634.v_entity_ksm_degrees.CLASS_SECTION,
+aff.affil_code,
+aff.affil_level_code,
+aff.class_year
+
+
+From ep_event
+
+Left Join ep_registration ON ep_registration.event_id = ep_event.event_id
+
+Left Join rpt_pbh634.v_entity_ksm_degrees ON rpt_pbh634.v_entity_ksm_degrees.ID_NUMBER = ep_registration.contact_id_number
+
+Left Join aff ON aff.id_number = ep_registration.contact_id_number
+
+Where ep_event.event_id IN ('21120','22429');
