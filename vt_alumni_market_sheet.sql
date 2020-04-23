@@ -39,7 +39,13 @@ Select summary.prospect_id,
        summary.manager_ids,
        summary.managers,
        summary.curr_ksm_manager
-From rpt_pbh634.v_assignment_summary summary)
+From rpt_pbh634.v_assignment_summary summary),
+
+KSM_Model As (
+select prospect.ID_NUMBER,
+prospect.mgo_pr_model,
+prospect.mgo_pr_score
+from rpt_pbh634.v_ksm_prospect_pool prospect)
 
 Select house.ID_NUMBER,
        house.REPORT_NAME,       
@@ -81,13 +87,16 @@ Select house.ID_NUMBER,
        give.AF_PFY5,
        give.LAST_GIFT_DATE,
        give.LAST_GIFT_TYPE,
-       give.LAST_GIFT_ALLOC_CODE
+       give.LAST_GIFT_ALLOC_CODE,
+       KSM_Model.mgo_pr_model,
+       KSM_Model.mgo_pr_score
 From rpt_pbh634.v_entity_ksm_households house
 Inner Join KSM_PHS ON KSM_PHS.id_number = house.id_number
 Left Join employ ON employ.id_number = house.ID_NUMBER
 Left Join entity on entity.id_number = house.ID_NUMBER
 Left Join KSM_Assignment ON KSM_Assignment.id_number = house.ID_NUMBER
 Left Join  rpt_pbh634.v_ksm_giving_summary give on give.ID_NUMBER = house.id_number
+Left Join  KSM_Model ON KSM_Model.id_number = house.ID_NUMBER
 Order by house.REPORT_NAME ASC;
 
 
