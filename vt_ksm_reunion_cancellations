@@ -1,0 +1,18 @@
+create or replace view vt_ksm_reunion_cancellations as
+Select ep_event.event_id,
+ep_registration.contact_id_number,
+deg.REPORT_NAME,
+deg.RECORD_STATUS_CODE,
+deg.FIRST_KSM_YEAR,
+deg.PROGRAM,
+deg.PROGRAM_GROUP,
+ep_event.event_name,
+TMS_EVENT_REGISTRATION_STATUS.short_desc,
+ep_registration.response_date
+From ep_event
+Left join ep_registration on ep_registration.event_id = ep_event.event_id
+Left join rpt_pbh634.v_entity_ksm_degrees deg on deg.ID_NUMBER = ep_registration.contact_id_number
+Left join TMS_EVENT_REGISTRATION_STATUS ON TMS_EVENT_REGISTRATION_STATUS.registration_status_code = ep_registration.registration_status_code
+Where ep_event.event_id = 22429
+And ep_registration.registration_status_code = '4'
+Order by ep_registration.response_date ASC;
