@@ -1,4 +1,5 @@
 create or replace view vt_ksm_phs as
+
 With KSM_PHS AS (Select comm.id_number,
        comm.committee_code,
        comm.committee_status_code,
@@ -7,8 +8,8 @@ From committee comm
 Where comm.committee_code IN ('KPH')
 And comm.committee_status_code = 'C')
 
-Select market.id_number,
-       market.REPORT_NAME,
+Select house.ID_NUMBER,
+       house.REPORT_NAME,
        KSM_PHS.committee_code,
        KSM_PHS.committee_status_code,
        KSM_PHS.start_dt,
@@ -49,9 +50,8 @@ Select market.id_number,
        give.LAST_GIFT_DATE,
        give.LAST_GIFT_TYPE,
        give.LAST_GIFT_ALLOC_CODE
-From vt_alumni_market_sheet market
-
-inner Join KSM_PHS ON KSM_PHS.id_number = market.id_number
-left join  rpt_pbh634.v_ksm_giving_summary give on give.ID_NUMBER = market.id_number
-
-Order by market.REPORT_NAME ASC;
+From rpt_pbh634.v_entity_ksm_households house
+left join vt_alumni_market_sheet market on market.id_number = house.ID_NUMBER
+inner Join KSM_PHS ON KSM_PHS.id_number = house.id_number
+left join  rpt_pbh634.v_ksm_giving_summary give on give.ID_NUMBER = house.id_number
+Order by house.REPORT_NAME ASC;
