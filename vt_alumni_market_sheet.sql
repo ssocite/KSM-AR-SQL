@@ -65,18 +65,11 @@ rpt_pbh634.v_entity_ksm_households.HOUSEHOLD_COUNTRY,
 
 rpt_pbh634.v_entity_ksm_households.HOUSEHOLD_CONTINENT,
 
-rpt_pbh634.v_ksm_prospect_pool.prospect_manager_id,
+rpt_pbh634.v_assignment_summary.prospect_manager,
 
-rpt_pbh634.v_ksm_prospect_pool.prospect_manager,
+rpt_pbh634.v_assignment_summary.lgos,
 
-rpt_pbh634.v_ksm_prospect_pool.mgo_pr_score,
-
-rpt_pbh634.v_ksm_prospect_pool.mgo_pr_model,
-
-vt_leadership_giving_officer.assignment_id_number,
-
-vt_leadership_giving_officer.Leadership_Giving_Officer
-
+rpt_pbh634.v_assignment_summary.managers
 
 From rpt_pbh634.v_entity_ksm_degrees
 
@@ -96,15 +89,8 @@ Left Join Employ On rpt_pbh634.v_entity_ksm_degrees.ID_NUMBER = Employ.Id_Number
 
 Left Join rpt_pbh634.v_ksm_prospect_pool on rpt_pbh634.v_ksm_prospect_pool.ID_NUMBER = rpt_pbh634.v_entity_ksm_degrees.ID_NUMBER
 
----- Join Assignment
+---- Join Assignment 
 
-Left Join Assignment on assignment.id_number = rpt_pbh634.v_entity_ksm_degrees.ID_NUMBER
+Left Join rpt_pbh634.v_assignment_summary on rpt_pbh634.v_assignment_summary.id_number = rpt_pbh634.v_entity_ksm_degrees.ID_NUMBER
 
---- Join Leadership Giving Officer
-
-Full Outer Join vt_leadership_giving_officer ON vt_leadership_giving_officer.id_number = rpt_pbh634.v_entity_ksm_degrees.ID_NUMBER
-
----- Active Alumni
-
-Where rpt_pbh634.v_entity_ksm_degrees.Record_Status_Code = 'A'
-;
+Where rpt_pbh634.v_entity_ksm_degrees.RECORD_STATUS_CODE = 'A'
