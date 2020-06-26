@@ -20,7 +20,12 @@ employ As (
   Left Join tms_fld_of_work fow
        On fow.fld_of_work_code = employment.fld_of_work_code
   Where employment.primary_emp_ind = 'Y'
-)
+),
+
+KSM_Continent As (Select rpt_pbh634.v_addr_continents.country,
+rpt_pbh634.v_addr_continents.KSM_Continent
+From rpt_pbh634.v_addr_continents
+Where rpt_pbh634.v_addr_continents.KSM_Continent is not null)
 
 --- Degree Fields
 
@@ -65,6 +70,8 @@ rpt_pbh634.v_entity_ksm_households.HOUSEHOLD_COUNTRY,
 
 rpt_pbh634.v_entity_ksm_households.HOUSEHOLD_CONTINENT,
 
+KSM_Continent.KSM_Continent,
+
 rpt_pbh634.v_assignment_summary.prospect_manager,
 
 rpt_pbh634.v_assignment_summary.lgos,
@@ -92,5 +99,9 @@ Left Join rpt_pbh634.v_ksm_prospect_pool on rpt_pbh634.v_ksm_prospect_pool.ID_NU
 ---- Join Assignment 
 
 Left Join rpt_pbh634.v_assignment_summary on rpt_pbh634.v_assignment_summary.id_number = rpt_pbh634.v_entity_ksm_degrees.ID_NUMBER
+
+---- Join Contitent Subquery (Used to get Special Regions: Middle East, South Asia, Latin America)
+
+Left Join KSM_Continent ON KSM_Continent.country = rpt_pbh634.v_entity_ksm_households.HOUSEHOLD_Country
 
 Where rpt_pbh634.v_entity_ksm_degrees.RECORD_STATUS_CODE = 'A'
