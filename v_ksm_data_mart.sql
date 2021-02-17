@@ -295,6 +295,9 @@ Updated 2019-11-12
 Primary job title and employer are defined as the title/company associated
 with the current business address if they are filled in; otherwise
 the current primary employer defined in v_datamart_employment
+
+Updated 2020-12-18
+Report Name and Linkedin address added for alumni data profile project
 ************************************************************************/
 
 Create Or Replace View v_datamart_entities As
@@ -308,7 +311,7 @@ emp As (
     , empl.employment_start_date
     , empl.job_title
     , empl.employer
-  From v_datamart_employment empl
+  From rpt_pbh634.v_datamart_employment empl
   Where empl.job_status_code = 'C' -- current only
     And empl.primary_employer_indicator = 'Y' -- primary employer only
 )
@@ -318,12 +321,21 @@ emp As (
     intr.catracks_id
     , Listagg(intr.interest_desc, '; ') Within Group (Order By interest_start_date Asc, interest_desc Asc)
       As interests_concat
-  From v_datamart_career_interests intr
+  From rpt_pbh634.v_datamart_career_interests intr
   Group By intr.catracks_id
 )
 
+, linked as (select distinct ec.id_number,
+max(ec.start_dt) keep(dense_rank First Order By ec.start_dt Desc, ec.econtact asc) As Max_Date,
+max (ec.econtact) keep(dense_rank First Order By ec.start_dt Desc, ec.econtact asc) as linkedin_address
+from econtact ec
+where  ec.econtact_status_code = 'A'
+and  ec.econtact_type_code = 'L'
+Group By ec.id_number)
+
 Select
   deg.id_number As catracks_id
+  , deg.report_name
   , deg.degrees_concat
   , deg.degrees_verbose
   , deg.program
@@ -356,14 +368,17 @@ Select
   , addr.business_geo_primary_desc
   , addr.business_start_date
   , intr.interests_concat
+  , linked.linkedin_address
 From rpt_pbh634.v_entity_ksm_degrees deg
 Left Join tms_record_status tms_rs
   On tms_rs.record_status_code = deg.record_status_code
-Left Join v_datamart_address addr
+Left Join rpt_pbh634.v_datamart_address addr
   On addr.catracks_id = deg.id_number
 Left join emp
   On emp.catracks_id = deg.id_number
 Left Join intr
   On intr.catracks_id = deg.id_number
+Left Join linked
+  On linked.id_number = deg.id_number
 Where deg.record_status_code In ('A', 'C', 'L', 'D')
 ;
