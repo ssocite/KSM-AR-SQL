@@ -1,6 +1,5 @@
-Create or Replace View vt_alumni_volunteership AS
-
-With 
+create or replace view vt_alumni_volunteership as
+With
 
 committee_volunteer As (Select *
 
@@ -8,7 +7,7 @@ from rpt_pbh634.v_nu_committees
 
 --- Members of Committees From Bridget's Excel Sheet (Lines 1-59)
 
-where rpt_pbh634.v_nu_committees.committee_code IN 
+where rpt_pbh634.v_nu_committees.committee_code IN
 ('KACHB',
 'KACAT',
 'KACBE',
@@ -67,14 +66,14 @@ where rpt_pbh634.v_nu_committees.committee_code IN
 'KACSI',
 'NU023',
 '587')
-And 
+And
 rpt_pbh634.v_nu_committees.committee_status_code = 'C'
 And
---- Club Leader, President, President Elect, Vice President, Member, Chair, National Trustee, Life Trustee, Charter Trustee, 
+--- Club Leader, President, President Elect, Vice President, Member, Chair, National Trustee, Life Trustee, Charter Trustee,
 rpt_pbh634.v_nu_committees.committee_role_code In ('CL','P','PE','I'))
 
 
-Select 
+Select
 committee_volunteer.id_number,
 committee_volunteer.committee_desc,
 committee_volunteer.committee_status,
@@ -94,7 +93,7 @@ Left Join rpt_pbh634.v_entity_ksm_households house On house.ID_NUMBER = committe
 
 UNION ALL
 
-Select 
+Select
 
 rpt_pbh634.v_nu_committees.id_number,
 rpt_pbh634.v_nu_committees.committee_desc,
@@ -113,9 +112,9 @@ house.HOUSEHOLD_COUNTRY
 From rpt_pbh634.v_nu_committees
 Left Join rpt_pbh634.v_entity_ksm_households house on house.ID_NUMBER = rpt_pbh634.v_nu_committees.id_number
 
---- Trying to get the rest of the members from Bridget's Excel Sheet (Below Line 60) 
+--- Trying to get the rest of the members from Bridget's Excel Sheet (Below Line 60)
 
-Where rpt_pbh634.v_nu_committees.committee_code IN 
+Where rpt_pbh634.v_nu_committees.committee_code IN
 ('227',
 'KACNA',
 'KACAO',
@@ -132,7 +131,7 @@ Where rpt_pbh634.v_nu_committees.committee_code IN
 'NMP',
 'GAMB')
 
-And 
+And
 
 rpt_pbh634.v_nu_committees.committee_status = 'Current'
 
@@ -141,3 +140,4 @@ rpt_pbh634.v_nu_committees.committee_status = 'Current'
 --- Life Trustee, Member, Chair, Life Member, Charter Trustee, National Trustee
 
 rpt_pbh634.v_nu_committees.committee_role_code IN ('TL', 'M', 'C', 'LM','CT','NT')*/
+;
