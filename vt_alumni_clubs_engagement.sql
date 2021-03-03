@@ -1,6 +1,5 @@
-Create Or Replace View vt_alumni_clubs_engagement As
-
-Select distinct 
+create or replace view vt_alumni_clubs_engagement as
+Select distinct
 
 ---- Select ID Number
 EP_Participant.Id_Number,
@@ -10,7 +9,7 @@ EP_Event.Event_Id,
 
 --- Select Names
 
-Entity.Last_Name, 
+Entity.Last_Name,
 Entity.First_Name,
 Entity.Record_Type_Code,
 
@@ -40,22 +39,23 @@ Where EP_Event.Event_Start_Datetime >= To_Date ('09/01/2016','mm/dd/yyyy')
 --- Registration Status = 2 (Registrations)
 And (ep_registration.registration_status_code = '2'
 
---- Pulling KSM School Organizer Code  
+--- Pulling KSM School Organizer Code
 And EP_Event_Organizer.Organization_Id = '0000697410'
 
 ---- Paul's Table (Kellogg Organizer is Yes)
 
 And rpt_pbh634.v_nu_events.kellogg_organizers = 'Y'
 
---- Pulling Kellogg Club Code 
+--- Pulling Kellogg Club Code
 Or EP_Event_Codes.Event_Code = '400')
 
---- Removing IDs without a name 
-And Entity.Id_Number is not null 
+--- Removing IDs without a name
+And Entity.Id_Number is not null
 
---- Alumni or Student Status Only 
+--- Alumni or Student Status Only
 
 And (Entity.Record_Type_Code = 'AL' or
 Entity.Record_Status_Code = 'ST')
 
 Order By EP_Event.Event_Id ASC
+;
