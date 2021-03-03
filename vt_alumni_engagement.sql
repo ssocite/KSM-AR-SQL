@@ -1,14 +1,5 @@
---- KSM Engagement SQL Query!
-
---- Create 3 subquries: Events, Volunteership and Giving. 
---- Basetable: KSM Degrees Table 
-
---- Create Event Subquery --- Using Paul's NU Events Now. Selecting only relevant information. 
---- Include event codes concat just in case we want to look at specific events later once work-study cleanup is finished.
-
-Create or Replace View vt_alumni_engagement AS
-
-With Club_Event As (Select Distinct 
+create or replace view vt_alumni_engagement as
+With Club_Event As (Select Distinct
 
 EP_Participant.Id_Number,
 
@@ -30,20 +21,20 @@ Left Join EP_Participant ON Event.Event_Id = Ep_Participant.Event_Id
 
 Where Event.ksm_event = 'Y'),
 
---- Creating Givers Subquery ---- From Paul's reccomended code in April. Including FY 17-20 Giving. 
---- Givers = NGC or Cash with Stewardship > 0 
+--- Creating Givers Subquery ---- From Paul's reccomended code in April. Including FY 17-20 Giving.
+--- Givers = NGC or Cash with Stewardship > 0
 
 KSM_Givers As (Select
 
-rpt_pbh634.v_ksm_giving_summary.id_number, 
+rpt_pbh634.v_ksm_giving_summary.id_number,
 
-rpt_pbh634.v_ksm_giving_summary.NGC_CFY, 
+rpt_pbh634.v_ksm_giving_summary.NGC_CFY,
 
 rpt_pbh634.v_ksm_giving_summary.CASH_CFY,
 
-rpt_pbh634.v_ksm_giving_summary.ngc_pfy1, 
+rpt_pbh634.v_ksm_giving_summary.ngc_pfy1,
 
-rpt_pbh634.v_ksm_giving_summary.cash_pfy1, 
+rpt_pbh634.v_ksm_giving_summary.cash_pfy1,
 
 rpt_pbh634.v_ksm_giving_summary.ngc_pfy2,
 
@@ -55,7 +46,7 @@ rpt_pbh634.v_ksm_giving_summary.cash_pfy3
 
 From rpt_pbh634.v_ksm_giving_summary
 
---- Inner Join because we want only donors from this subquery 
+--- Inner Join because we want only donors from this subquery
 
 Inner Join rpt_pbh634.v_entity_ksm_degrees ON rpt_pbh634.v_entity_ksm_degrees.ID_NUMBER = rpt_pbh634.v_ksm_giving_summary.ID_NUMBER
 
@@ -69,9 +60,9 @@ or stewardship_pfy3 > 0
 ),
 
 --- Volunteer Subquery --- From Bridget's Volunteer Code
---- Volunteer View Modified (I took out the trustee inclusion). Added KACAO and KALC.  
+--- Volunteer View Modified (I took out the trustee inclusion). Added KACAO and KALC.
 
-Volunteer AS (Select 
+Volunteer AS (Select
 
 vt_alumni_volunteership.id_number,
 
@@ -87,13 +78,46 @@ vt_alumni_volunteership.committee_role_code,
 
 vt_alumni_volunteership.committee_role
 
-From vt_alumni_volunteership)
+From vt_alumni_volunteership),
+
+--- Activity Subquery
+
+KSM_Activity As (select
+
+act.id_number,
+
+act.report_name,
+
+act.activity_code,
+
+act.activity_desc,
+
+act.activity_participation_code,
+
+act.start_dt,
+
+act.stop_dt,
+
+act.date_added,
+
+act.date_modified,
+
+act.start_fy_calc,
+
+act.stop_fy_calc
+
+From rpt_pbh634.v_nu_activities act
+
+Inner Join rpt_pbh634.v_entity_ksm_degrees deg on deg.ID_NUMBER = act.id_number
+
+Where act.activity_code IN ('KCR','KEH','KSM','KSP','KCF','KCE')
+)
 
 --- Select ID, Name, Record Status, Degrees Information, Name/Date of Event, Giving in FY 17, 18, 19, 20, Volunteer Information
 
-Select 
+Select
 
---- Degrees from Basetable. Used to identify Kellogg alumns in the giving, event volunteer section. 
+--- Degrees from Basetable. Used to identify Kellogg alumns in the giving, event volunteer section.
 
 deg.ID_NUMBER,
 
@@ -111,7 +135,7 @@ Club_Event.start_dt,
 
 Club_Event.start_fy_calc,
 
---- Identifying Givers in FY 17, 18, 19, 20 From Givers Subquery. 
+--- Identifying Givers in FY 17, 18, 19, 20 From Givers Subquery.
 
 KSM_Givers.ngc_pfy1,
 
@@ -125,7 +149,7 @@ KSM_Givers.ngc_pfy3,
 
 KSM_Givers.cash_pfy3,
 
-KSM_Givers.ngc_cfy, 
+KSM_Givers.ngc_cfy,
 
 KSM_Givers.cash_cfy,
 
@@ -139,7 +163,13 @@ Volunteer.stop_dt_calc,
 
 Volunteer.committee_role_code,
 
---- Creating Case When for Recent, Mid-Career and Mature. 
+KSM_Activity.activity_desc,
+
+KSM_Activity.start_dt As Activity_Date ,
+
+KSM_Activity.start_fy_calc As Activity_FY_Year,
+
+--- Creating Case When for Recent, Mid-Career and Mature.
 CASE -- starting an If statement
      WHEN first_ksm_year >= cal.curr_fy - 6 -- this is where you give your conditions
        THEN 'Recent'
@@ -150,7 +180,7 @@ CASE -- starting an If statement
      END -- Same as in Tableau
 AS life_stage
 
---- We are using KSM Degrees as our base. We want this to be our demoninator in the metrics. 
+--- We are using KSM Degrees as our base. We want this to be our demoninator in the metrics.
 
 From rpt_pbh634.v_entity_ksm_degrees deg
 
@@ -161,3 +191,6 @@ Left Join Club_Event on Club_Event.id_number = deg.ID_NUMBER
 Left Join KSM_Givers on KSM_Givers.id_number = deg.ID_number
 
 Left Join Volunteer on Volunteer.id_number = deg.ID_NUMBER
+
+Left Join KSM_Activity on KSM_Activity.id_number = deg.ID_NUMBER
+;
