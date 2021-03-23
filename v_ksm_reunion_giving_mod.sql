@@ -3,7 +3,7 @@ With hh_giving As (
   Select *
   -- Replace this with rpt_pbh634.v_ksm_giving_trans_hh for live data
   -- Replace this with rpt_pbh634.tmp_mv_hhgt for a data snapshot (runs in ~20 sec)
-  From rpt_pbh634.tmp_mv_hhgt give
+  From rpt_pbh634.v_ksm_giving_trans_hh give
 )
 
 /* Steps
