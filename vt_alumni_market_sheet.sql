@@ -1,4 +1,5 @@
 create or replace view vt_alumni_market_sheet as
+
 With
 -- Employment table subquery
 employ As (
@@ -20,7 +21,34 @@ employ As (
   Left Join tms_fld_of_work fow
        On fow.fld_of_work_code = employment.fld_of_work_code
   Where employment.primary_emp_ind = 'Y'
-)
+),
+
+--- Prospect 1Mil + - Used for Ben's New Map (4/7/2021)
+
+Prospect_1M_Plus AS (
+Select distinct TP.ID_NUMBER,
+       TP.EVALUATION_RATING,
+       TP.OFFICER_RATING
+
+From nu_prs_trp_prospect TP
+
+Where TP.EVALUATION_RATING IN ('A7 $1M - $1.9M','A6 $2M - $4.9M','A5 $5M - $9.9M',
+
+'A4 $10M - $24.9M','A3 $25M - $49.9M')
+
+Or
+
+TP.OFFICER_RATING IN ('A7 $1M - $1.9M',
+
+'A6 $2M - $4.9M', 'A5 $5M - $9.9M', 'A4 $10M - $24.9M', 'A3 $25M - $49.9M')),
+
+--- KSM Assignments: LGO, PM, Manager
+
+ksm_assignment as (select distinct assign.id_number,
+assign.prospect_manager,
+assign.lgos,
+assign.managers
+from rpt_pbh634.v_assignment_summary assign)
 
 --- Degree Fields
 
@@ -65,26 +93,23 @@ rpt_pbh634.v_entity_ksm_households.HOUSEHOLD_COUNTRY,
 
 rpt_pbh634.v_entity_ksm_households.HOUSEHOLD_CONTINENT,
 
-rpt_pbh634.v_ksm_prospect_pool.prospect_manager_id,
+ksm_assignment.prospect_manager,
 
-rpt_pbh634.v_ksm_prospect_pool.prospect_manager,
+ksm_assignment.lgos,
 
-rpt_pbh634.v_ksm_prospect_pool.mgo_pr_score,
+ksm_assignment.managers,
 
-rpt_pbh634.v_ksm_prospect_pool.mgo_pr_model,
+Prospect_1M_Plus.EVALUATION_RATING,
 
-vt_leadership_giving_officer.assignment_id_number,
-
-vt_leadership_giving_officer.Leadership_Giving_Officer
-
+Prospect_1M_Plus.OFFICER_RATING
 
 From rpt_pbh634.v_entity_ksm_degrees
 
----- Join Entity
+---- Join Entity --- For Gender Code
 
 Inner Join Entity on rpt_pbh634.v_entity_ksm_degrees.ID_NUMBER = Entity.Id_Number
 
----- Join Households
+---- Join Households --- For Address
 
 Left Join rpt_pbh634.v_entity_ksm_households On rpt_pbh634.v_entity_ksm_degrees.ID_NUMBER = rpt_pbh634.v_entity_ksm_households.ID_NUMBER
 
@@ -92,17 +117,13 @@ Left Join rpt_pbh634.v_entity_ksm_households On rpt_pbh634.v_entity_ksm_degrees.
 
 Left Join Employ On rpt_pbh634.v_entity_ksm_degrees.ID_NUMBER = Employ.Id_Number
 
----- Join Prospect
-
-Left Join rpt_pbh634.v_ksm_prospect_pool on rpt_pbh634.v_ksm_prospect_pool.ID_NUMBER = rpt_pbh634.v_entity_ksm_degrees.ID_NUMBER
-
 ---- Join Assignment
 
-Left Join Assignment on assignment.id_number = rpt_pbh634.v_entity_ksm_degrees.ID_NUMBER
+Left Join ksm_assignment on ksm_assignment.id_number = rpt_pbh634.v_entity_ksm_degrees.ID_NUMBER
 
---- Join Leadership Giving Officer
+--- Join 1 Mil Prospect Plus 
 
-Full Outer Join vt_leadership_giving_officer ON vt_leadership_giving_officer.id_number = rpt_pbh634.v_entity_ksm_degrees.ID_NUMBER
+Left Join Prospect_1M_Plus on Prospect_1M_Plus.id_number = rpt_pbh634.v_entity_ksm_degrees.ID_NUMBER
 
 ---- Active Alumni
 
