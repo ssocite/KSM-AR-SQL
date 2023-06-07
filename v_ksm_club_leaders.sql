@@ -29,8 +29,8 @@ rpt_pbh634.v_entity_ksm_degrees.PROGRAM
 From committee
 
 --- Left Join Entity, Committee Header, Degree Table 
-Left Join Entity ON Entity.Id_Number = committee.id_number
-Left Join committee_header ON committee_header.committee_code = committee.committee_code
+Inner Join Entity ON Entity.Id_Number = committee.id_number
+Inner Join committee_header ON committee_header.committee_code = committee.committee_code
 Left Join rpt_pbh634.v_entity_ksm_degrees ON rpt_pbh634.v_entity_ksm_degrees.ID_NUMBER = committee.id_number
 
 --- Inner Joining Description of Committee 
